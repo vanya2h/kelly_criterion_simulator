@@ -1,4 +1,4 @@
-import type { Params } from './types'
+import type { Params } from "./types";
 
 export const DEFAULT_PARAMS: Params = {
   C0: 1000,
@@ -23,15 +23,15 @@ export const DEFAULT_PARAMS: Params = {
   maxFraction: 0.5,
 
   seed: 20260801,
-}
+};
 
 /** Above this many bet-steps, auto-run is suppressed and the button takes over. */
-export const AUTORUN_STEP_BUDGET = 400_000
+export const AUTORUN_STEP_BUDGET = 400_000;
 
 export function stepCount(p: Params): number {
-  return p.paths * p.N
+  return p.paths * p.N;
 }
 
 export function randomSeed(): number {
-  return (Math.random() * 0xffffffff) >>> 0
+  return (Math.random() * 0xffffffff) >>> 0;
 }

@@ -19,13 +19,20 @@ bets harder when small and calmer when large.
 ## Run it
 
 ```bash
-npm install
-npm run dev      # http://localhost:5173
+pnpm install
+pnpm dev         # http://localhost:5173
 ```
 
 ```bash
-npm run build    # → dist/kelly_simulator.html
+pnpm build       # → dist/kelly_simulator.html
+pnpm lint        # check package.json field order + ESLint
+pnpm lint:fix    # fix package.json field order + auto-fix ESLint issues
+pnpm check-types # type-check with tsc
+pnpm sort-pkg    # sort package.json field order
 ```
+
+The package manager is pinned in `package.json` (`packageManager: pnpm@10.33.2`),
+so Corepack picks the right pnpm automatically.
 
 The build inlines all JS, CSS and the simulation Web Worker into **one HTML
 file** with no external requests, so `dist/kelly_simulator.html` opens straight

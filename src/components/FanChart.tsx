@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState } from "react";
 import {
   Area,
   CartesianGrid,
@@ -9,24 +9,24 @@ import {
   Tooltip,
   XAxis,
   YAxis,
-} from 'recharts'
-import { fmtCapital, fmtInt } from '../lib/format'
-import type { ChartTheme } from '../lib/chartTheme'
-import type { Band, SimResult } from '../lib/types'
-import { ChartCard, Legend, Segmented } from './ui'
-import { VizTooltip } from './chartBits'
-import { axisProps, logFloorFor } from './chartHelpers'
+} from "recharts";
+import type { ChartTheme } from "../lib/chartTheme";
+import { fmtCapital, fmtInt } from "../lib/format";
+import type { Band, SimResult } from "../lib/types";
+import { VizTooltip } from "./chartBits";
+import { axisProps, logFloorFor } from "./chartHelpers";
+import { ChartCard, Legend, Segmented } from "./ui";
 
 interface Row {
-  i: number
-  band1090: [number, number]
-  band2575: [number, number]
-  p50: number
-  otherP50: number
-  p10: number
-  p25: number
-  p75: number
-  p90: number
+  i: number;
+  band1090: [number, number];
+  band2575: [number, number];
+  p50: number;
+  otherP50: number;
+  p10: number;
+  p25: number;
+  p75: number;
+  p90: number;
 }
 
 function buildRows(own: Band[], other: Band[], clamp: (v: number) => number): Row[] {
@@ -40,7 +40,7 @@ function buildRows(own: Band[], other: Band[], clamp: (v: number) => number): Ro
     p25: b.p25,
     p75: b.p75,
     p90: b.p90,
-  }))
+  }));
 }
 
 function FanPanel({
@@ -57,18 +57,18 @@ function FanPanel({
   N,
   C0,
 }: {
-  label: string
-  rows: Row[]
-  color: string
-  otherColor: string
-  otherLabel: string
-  soft: string
-  softer: string
-  domain: [number, number]
-  logScale: boolean
-  theme: ChartTheme
-  N: number
-  C0: number
+  label: string;
+  rows: Row[];
+  color: string;
+  otherColor: string;
+  otherLabel: string;
+  soft: string;
+  softer: string;
+  domain: [number, number];
+  logScale: boolean;
+  theme: ChartTheme;
+  N: number;
+  C0: number;
 }) {
   return (
     <div className="fan-panel">
@@ -83,15 +83,15 @@ function FanPanel({
             tickFormatter={fmtInt}
             {...axisProps(theme)}
             label={{
-              value: 'bet number',
-              position: 'insideBottom',
+              value: "bet number",
+              position: "insideBottom",
               offset: -12,
               fill: theme.muted,
               fontSize: 11,
             }}
           />
           <YAxis
-            scale={logScale ? 'log' : 'linear'}
+            scale={logScale ? "log" : "linear"}
             domain={domain}
             allowDataOverflow
             tickFormatter={fmtCapital}
@@ -105,19 +105,19 @@ function FanPanel({
               <VizTooltip
                 titleFmt={(l) => `after ${fmtInt(Number(l))} bets`}
                 series={[
-                  { key: 'p90', label: '90th pct', color: softer, fmt: (v) => fmtCapital(Number(v)) },
-                  { key: 'p75', label: '75th pct', color: soft, fmt: (v) => fmtCapital(Number(v)) },
+                  { key: "p90", label: "90th pct", color: softer, fmt: (v) => fmtCapital(Number(v)) },
+                  { key: "p75", label: "75th pct", color: soft, fmt: (v) => fmtCapital(Number(v)) },
                   {
-                    key: 'p50',
-                    label: 'median',
+                    key: "p50",
+                    label: "median",
                     color,
                     line: true,
                     fmt: (v) => fmtCapital(Number(v)),
                   },
-                  { key: 'p25', label: '25th pct', color: soft, fmt: (v) => fmtCapital(Number(v)) },
-                  { key: 'p10', label: '10th pct', color: softer, fmt: (v) => fmtCapital(Number(v)) },
+                  { key: "p25", label: "25th pct", color: soft, fmt: (v) => fmtCapital(Number(v)) },
+                  { key: "p10", label: "10th pct", color: softer, fmt: (v) => fmtCapital(Number(v)) },
                   {
-                    key: 'otherP50',
+                    key: "otherP50",
                     label: `${otherLabel} median`,
                     color: otherColor,
                     line: true,
@@ -127,20 +127,8 @@ function FanPanel({
               />
             }
           />
-          <Area
-            dataKey="band1090"
-            stroke="none"
-            fill={softer}
-            isAnimationActive={false}
-            activeDot={false}
-          />
-          <Area
-            dataKey="band2575"
-            stroke="none"
-            fill={soft}
-            isAnimationActive={false}
-            activeDot={false}
-          />
+          <Area dataKey="band1090" stroke="none" fill={softer} isAnimationActive={false} activeDot={false} />
+          <Area dataKey="band2575" stroke="none" fill={soft} isAnimationActive={false} activeDot={false} />
           <Line
             dataKey="otherP50"
             stroke={otherColor}
@@ -149,41 +137,33 @@ function FanPanel({
             dot={false}
             isAnimationActive={false}
           />
-          <Line
-            dataKey="p50"
-            stroke={color}
-            strokeWidth={2}
-            dot={false}
-            isAnimationActive={false}
-          />
+          <Line dataKey="p50" stroke={color} strokeWidth={2} dot={false} isAnimationActive={false} />
         </ComposedChart>
       </ResponsiveContainer>
     </div>
-  )
+  );
 }
 
 export function FanChart({ result, theme }: { result: SimResult; theme: ChartTheme }) {
-  const [logScale, setLogScale] = useState(true)
-  const { params, classic, adaptive } = result
-  const floor = logFloorFor(params.C0)
+  const [logScale, setLogScale] = useState(true);
+  const { params, classic, adaptive } = result;
+  const floor = logFloorFor(params.C0);
 
   const { classicRows, adaptiveRows, domain } = useMemo(() => {
-    const clamp = (v: number) => (logScale ? Math.max(v, floor) : Math.max(v, 0))
-    const c = buildRows(classic.bands, adaptive.bands, clamp)
-    const a = buildRows(adaptive.bands, classic.bands, clamp)
-    let hi = params.C0
-    let lo = params.C0
+    const clamp = (v: number) => (logScale ? Math.max(v, floor) : Math.max(v, 0));
+    const c = buildRows(classic.bands, adaptive.bands, clamp);
+    const a = buildRows(adaptive.bands, classic.bands, clamp);
+    let hi = params.C0;
+    let lo = params.C0;
     for (const r of [...c, ...a]) {
-      hi = Math.max(hi, r.band1090[1])
-      lo = Math.min(lo, r.band1090[0])
+      hi = Math.max(hi, r.band1090[1]);
+      lo = Math.min(lo, r.band1090[0]);
     }
-    const d: [number, number] = logScale
-      ? [Math.max(lo / 1.3, floor), hi * 1.15]
-      : [0, hi * 1.05]
-    return { classicRows: c, adaptiveRows: a, domain: d }
-  }, [classic.bands, adaptive.bands, logScale, floor, params.C0])
+    const d: [number, number] = logScale ? [Math.max(lo / 1.3, floor), hi * 1.15] : [0, hi * 1.05];
+    return { classicRows: c, adaptiveRows: a, domain: d };
+  }, [classic.bands, adaptive.bands, logScale, floor, params.C0]);
 
-  const shared = { domain, logScale, theme, N: params.N, C0: params.C0 }
+  const shared = { domain, logScale, theme, N: params.N, C0: params.C0 };
 
   return (
     <ChartCard
@@ -192,23 +172,23 @@ export function FanChart({ result, theme }: { result: SimResult; theme: ChartThe
       tools={
         <Segmented
           ariaLabel="Capital axis scale"
-          value={logScale ? 'log' : 'linear'}
-          onChange={(v) => setLogScale(v === 'log')}
+          value={logScale ? "log" : "linear"}
+          onChange={(v) => setLogScale(v === "log")}
           options={[
-            { value: 'log', label: 'Log' },
-            { value: 'linear', label: 'Linear' },
+            { value: "log", label: "Log" },
+            { value: "linear", label: "Linear" },
           ]}
         />
       }
       table={{
         columns: [
-          'Bet #',
-          'Classic p10',
-          'Classic median',
-          'Classic p90',
-          'Adaptive p10',
-          'Adaptive median',
-          'Adaptive p90',
+          "Bet #",
+          "Classic p10",
+          "Classic median",
+          "Classic p90",
+          "Adaptive p10",
+          "Adaptive median",
+          "Adaptive p90",
         ],
         rows: classic.bands.map((b, k) => [
           fmtInt(b.i),
@@ -223,7 +203,7 @@ export function FanChart({ result, theme }: { result: SimResult; theme: ChartThe
       footnote={
         logScale
           ? `Log axis clamps at ${fmtCapital(floor)} — a band touching the bottom edge means a tenth or more of the paths are at or near zero.`
-          : 'Linear axis: the top decile of a compounding process dwarfs the median, so most of the plot will look flat. Switch to log to read the typical path.'
+          : "Linear axis: the top decile of a compounding process dwarfs the median, so most of the plot will look flat. Switch to log to read the typical path."
       }
     >
       <div className="fan-grid">
@@ -250,16 +230,16 @@ export function FanChart({ result, theme }: { result: SimResult; theme: ChartThe
       </div>
       <Legend
         entries={[
-          { label: 'Classic median', color: theme.classic },
-          { label: 'Adaptive median', color: theme.adaptive },
-          { label: '25–75 percentile band (panel colour)', color: theme.secondary, kind: 'area', opacity: 0.35 },
-          { label: '10–90 percentile band (panel colour)', color: theme.secondary, kind: 'area', opacity: 0.18 },
+          { label: "Classic median", color: theme.classic },
+          { label: "Adaptive median", color: theme.adaptive },
+          { label: "25–75 percentile band (panel colour)", color: theme.secondary, kind: "area", opacity: 0.35 },
+          { label: "10–90 percentile band (panel colour)", color: theme.secondary, kind: "area", opacity: 0.18 },
         ]}
       />
       <p className="note">
-        In each panel the bold line is that panel&apos;s own median and the thin, faded line is the
-        other strategy&apos;s median, drawn for direct comparison.
+        In each panel the bold line is that panel&apos;s own median and the thin, faded line is the other
+        strategy&apos;s median, drawn for direct comparison.
       </p>
     </ChartCard>
-  )
+  );
 }

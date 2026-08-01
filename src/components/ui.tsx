@@ -1,27 +1,27 @@
-import { useId, useState, type ReactNode } from 'react'
+import { type ReactNode, useId, useState } from "react";
 
 /* ------------------------------------------------------------------ */
 /* Controls                                                            */
 /* ------------------------------------------------------------------ */
 
 interface FieldProps {
-  label: string
-  hint: string
-  value: number
-  onChange: (v: number) => void
-  min: number
-  max: number
-  step?: number
+  label: string;
+  hint: string;
+  value: number;
+  onChange: (v: number) => void;
+  min: number;
+  max: number;
+  step?: number;
   /** Show the raw value with this formatter instead of the number itself. */
-  format?: (v: number) => string
+  format?: (v: number) => string;
   /** Map the slider geometrically — right for ranges spanning decades. */
-  log?: boolean
-  disabled?: boolean
+  log?: boolean;
+  disabled?: boolean;
   /** Extra control rendered to the right of the numeric input. */
-  extra?: ReactNode
+  extra?: ReactNode;
 }
 
-const SLIDER_TICKS = 1000
+const SLIDER_TICKS = 1000;
 
 export function Field({
   label,
@@ -36,22 +36,22 @@ export function Field({
   disabled = false,
   extra,
 }: FieldProps) {
-  const id = useId()
-  const clamp = (v: number) => Math.min(max, Math.max(min, v))
+  const id = useId();
+  const clamp = (v: number) => Math.min(max, Math.max(min, v));
 
   const toSlider = (v: number) => {
-    if (!log) return v
-    const lo = Math.log(Math.max(min, 1e-9))
-    const hi = Math.log(max)
-    return ((Math.log(Math.max(clamp(v), 1e-9)) - lo) / (hi - lo)) * SLIDER_TICKS
-  }
+    if (!log) return v;
+    const lo = Math.log(Math.max(min, 1e-9));
+    const hi = Math.log(max);
+    return ((Math.log(Math.max(clamp(v), 1e-9)) - lo) / (hi - lo)) * SLIDER_TICKS;
+  };
   const fromSlider = (s: number) => {
-    if (!log) return s
-    const lo = Math.log(Math.max(min, 1e-9))
-    const hi = Math.log(max)
-    const v = Math.exp(lo + (s / SLIDER_TICKS) * (hi - lo))
-    return step >= 1 ? Math.round(v) : v
-  }
+    if (!log) return s;
+    const lo = Math.log(Math.max(min, 1e-9));
+    const hi = Math.log(max);
+    const v = Math.exp(lo + (s / SLIDER_TICKS) * (hi - lo));
+    return step >= 1 ? Math.round(v) : v;
+  };
 
   return (
     <div className="field">
@@ -79,14 +79,14 @@ export function Field({
           step={step}
           value={Number(value.toPrecision(10))}
           onChange={(e) => {
-            const v = Number(e.target.value)
-            if (Number.isFinite(v)) onChange(clamp(v))
+            const v = Number(e.target.value);
+            if (Number.isFinite(v)) onChange(clamp(v));
           }}
         />
         {extra}
       </div>
     </div>
-  )
+  );
 }
 
 export function Toggle({
@@ -94,16 +94,16 @@ export function Toggle({
   checked,
   onChange,
 }: {
-  label: string
-  checked: boolean
-  onChange: (v: boolean) => void
+  label: string;
+  checked: boolean;
+  onChange: (v: boolean) => void;
 }) {
   return (
     <label className="toggle">
       <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} />
       {label}
     </label>
-  )
+  );
 }
 
 export function Segmented<T extends string>({
@@ -112,25 +112,20 @@ export function Segmented<T extends string>({
   onChange,
   ariaLabel,
 }: {
-  options: { value: T; label: string }[]
-  value: T
-  onChange: (v: T) => void
-  ariaLabel: string
+  options: { value: T; label: string }[];
+  value: T;
+  onChange: (v: T) => void;
+  ariaLabel: string;
 }) {
   return (
     <div className="seg" role="group" aria-label={ariaLabel}>
       {options.map((o) => (
-        <button
-          key={o.value}
-          type="button"
-          aria-pressed={value === o.value}
-          onClick={() => onChange(o.value)}
-        >
+        <button key={o.value} type="button" aria-pressed={value === o.value} onClick={() => onChange(o.value)}>
           {o.label}
         </button>
       ))}
     </div>
-  )
+  );
 }
 
 /* ------------------------------------------------------------------ */
@@ -138,8 +133,8 @@ export function Segmented<T extends string>({
 /* ------------------------------------------------------------------ */
 
 export interface TableSpec {
-  columns: string[]
-  rows: (string | number)[][]
+  columns: string[];
+  rows: (string | number)[][];
 }
 
 export function ChartCard({
@@ -151,16 +146,16 @@ export function ChartCard({
   footnote,
   stale = false,
 }: {
-  title: string
-  description: string
-  tools?: ReactNode
+  title: string;
+  description: string;
+  tools?: ReactNode;
   /** Table-view twin; every value on the chart must be reachable here. */
-  table?: TableSpec
-  children: ReactNode
-  footnote?: ReactNode
-  stale?: boolean
+  table?: TableSpec;
+  children: ReactNode;
+  footnote?: ReactNode;
+  stale?: boolean;
 }) {
-  const [view, setView] = useState<'chart' | 'table'>('chart')
+  const [view, setView] = useState<"chart" | "table">("chart");
   return (
     <section className="card">
       <div className="card-head">
@@ -176,19 +171,19 @@ export function ChartCard({
               value={view}
               onChange={setView}
               options={[
-                { value: 'chart', label: 'Chart' },
-                { value: 'table', label: 'Table' },
+                { value: "chart", label: "Chart" },
+                { value: "table", label: "Table" },
               ]}
             />
           )}
         </div>
       </div>
-      <div className={stale ? 'stale' : undefined}>
-        {view === 'chart' || !table ? children : <DataTable spec={table} />}
+      <div className={stale ? "stale" : undefined}>
+        {view === "chart" || !table ? children : <DataTable spec={table} />}
       </div>
       {footnote && <p className="note">{footnote}</p>}
     </section>
-  )
+  );
 }
 
 export function DataTable({ spec }: { spec: TableSpec }) {
@@ -213,7 +208,7 @@ export function DataTable({ spec }: { spec: TableSpec }) {
         </tbody>
       </table>
     </div>
-  )
+  );
 }
 
 /* ------------------------------------------------------------------ */
@@ -221,10 +216,10 @@ export function DataTable({ spec }: { spec: TableSpec }) {
 /* ------------------------------------------------------------------ */
 
 export interface LegendEntry {
-  label: string
-  color: string
-  kind?: 'line' | 'area'
-  opacity?: number
+  label: string;
+  color: string;
+  kind?: "line" | "area";
+  opacity?: number;
 }
 
 export function Legend({ entries }: { entries: LegendEntry[] }) {
@@ -233,12 +228,12 @@ export function Legend({ entries }: { entries: LegendEntry[] }) {
       {entries.map((e) => (
         <span className="legend-item" key={e.label}>
           <span
-            className={e.kind === 'area' ? 'swatch' : 'swatch line'}
+            className={e.kind === "area" ? "swatch" : "swatch line"}
             style={{ background: e.color, opacity: e.opacity ?? 1 }}
           />
           {e.label}
         </span>
       ))}
     </div>
-  )
+  );
 }

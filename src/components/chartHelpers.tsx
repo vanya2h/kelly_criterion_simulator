@@ -1,13 +1,13 @@
-import type { ReactElement } from 'react'
+import type { ReactElement } from "react";
 
 /* ------------------------------------------------------------------ */
 /* Selective direct labels                                             */
 /* ------------------------------------------------------------------ */
 
 interface LabelProps {
-  x?: number | string
-  y?: number | string
-  index?: number
+  x?: number | string;
+  y?: number | string;
+  index?: number;
 }
 
 /**
@@ -19,8 +19,8 @@ interface LabelProps {
  */
 export function endLabel(text: string, color: string, lastIndex: number, dy = 4) {
   return function EndLabel(props: unknown): ReactElement | null {
-    const { x, y, index } = props as LabelProps
-    if (index !== lastIndex || x == null || y == null) return null
+    const { x, y, index } = props as LabelProps;
+    if (index !== lastIndex || x == null || y == null) return null;
     return (
       <text
         x={Number(x) + 7}
@@ -29,12 +29,12 @@ export function endLabel(text: string, color: string, lastIndex: number, dy = 4)
         fill={color}
         fontSize={11}
         fontWeight={650}
-        style={{ pointerEvents: 'none' }}
+        style={{ pointerEvents: "none" }}
       >
         {text}
       </text>
-    )
-  }
+    );
+  };
 }
 
 /** Axis/tick styling shared by every chart, kept recessive on purpose. */
@@ -44,10 +44,10 @@ export function axisProps(theme: { axis: string; muted: string }) {
     tick: { fill: theme.muted, fontSize: 11 },
     tickLine: false,
     axisLine: { stroke: theme.axis },
-  } as const
+  } as const;
 }
 
 /** Log axes cannot show zero; clamp to a floor and say so in a footnote. */
 export function logFloorFor(C0: number): number {
-  return Math.max(C0 * 1e-4, 1e-6)
+  return Math.max(C0 * 1e-4, 1e-6);
 }

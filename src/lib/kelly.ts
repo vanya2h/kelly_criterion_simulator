@@ -1,4 +1,4 @@
-import type { Params } from './types'
+import type { Params } from "./types";
 
 /**
  * Kelly-optimal fraction of capital for a discrete edge bet.
@@ -8,8 +8,8 @@ import type { Params } from './types'
  * Negative f* means the bet has no edge and the optimal action is not to bet.
  */
 export function kellyFraction(p: number, b: number): number {
-  if (!(b > 0)) return 0
-  return p - (1 - p) / b
+  if (!(b > 0)) return 0;
+  return p - (1 - p) / b;
 }
 
 /**
@@ -28,14 +28,14 @@ export function adaptiveLambda(
   cRef: number,
   steepness: number,
 ): number {
-  if (!(cRef > 0)) return lambdaMin
-  const x = Math.max(C, 0) / cRef
-  const denom = 1 + Math.pow(x, steepness)
-  return lambdaMin + (lambdaMax - lambdaMin) / denom
+  if (!(cRef > 0)) return lambdaMin;
+  const x = Math.max(C, 0) / cRef;
+  const denom = 1 + Math.pow(x, steepness);
+  return lambdaMin + (lambdaMax - lambdaMin) / denom;
 }
 
 /** Sentinel returned by {@link stakeFor} when a minimum ticket cannot be funded. */
-export const CANNOT_FUND = -1
+export const CANNOT_FUND = -1;
 
 /**
  * Stake for one bet, after every clamp:
@@ -49,22 +49,16 @@ export const CANNOT_FUND = -1
  * larger than the whole bankroll the path cannot bet and is stuck — that is the
  * {@link CANNOT_FUND} case, counted as ruin.
  */
-export function stakeFor(
-  lambda: number,
-  fStar: number,
-  C: number,
-  maxFraction: number,
-  minBet: number,
-): number {
-  let s = lambda * fStar * C
-  if (!(s > 0)) return 0
-  const cap = maxFraction * C
-  if (s > cap) s = cap
+export function stakeFor(lambda: number, fStar: number, C: number, maxFraction: number, minBet: number): number {
+  let s = lambda * fStar * C;
+  if (!(s > 0)) return 0;
+  const cap = maxFraction * C;
+  if (s > cap) s = cap;
   if (minBet > 0 && s < minBet) {
-    if (minBet > C) return CANNOT_FUND
-    s = minBet
+    if (minBet > C) return CANNOT_FUND;
+    s = minBet;
   }
-  return s > C ? C : s
+  return s > C ? C : s;
 }
 
 /** Sample points of the lambda(C) curve, for plotting. */
@@ -73,14 +67,14 @@ export function lambdaCurve(
   maxCapital: number,
   samples = 160,
 ): { C: number; adaptive: number; classic: number }[] {
-  const out: { C: number; adaptive: number; classic: number }[] = []
+  const out: { C: number; adaptive: number; classic: number }[] = [];
   for (let i = 0; i <= samples; i++) {
-    const C = (maxCapital * i) / samples
+    const C = (maxCapital * i) / samples;
     out.push({
       C,
       adaptive: adaptiveLambda(C, params.lambdaMin, params.lambdaMax, params.cRef, params.steepness),
       classic: params.lambdaConst,
-    })
+    });
   }
-  return out
+  return out;
 }

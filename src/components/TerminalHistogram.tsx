@@ -1,45 +1,30 @@
-import { useMemo, useState } from 'react'
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  ReferenceLine,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts'
-import { sharedHistogram } from '../lib/stats'
-import { fmtCapital, fmtInt, fmtPct } from '../lib/format'
-import type { ChartTheme } from '../lib/chartTheme'
-import type { SimResult } from '../lib/types'
-import { ChartCard, Legend, Segmented } from './ui'
-import { VizTooltip } from './chartBits'
-import { axisProps } from './chartHelpers'
+import { useMemo, useState } from "react";
+import { Bar, BarChart, CartesianGrid, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import type { ChartTheme } from "../lib/chartTheme";
+import { fmtCapital, fmtInt, fmtPct } from "../lib/format";
+import { sharedHistogram } from "../lib/stats";
+import type { SimResult } from "../lib/types";
+import { VizTooltip } from "./chartBits";
+import { axisProps } from "./chartHelpers";
+import { ChartCard, Legend, Segmented } from "./ui";
 
-const BINS = 36
+const BINS = 36;
 
 export function TerminalHistogram({ result, theme }: { result: SimResult; theme: ChartTheme }) {
-  const [logBins, setLogBins] = useState(true)
-  const { params, classic, adaptive } = result
+  const [logBins, setLogBins] = useState(true);
+  const { params, classic, adaptive } = result;
 
   const data = useMemo(() => {
-    const bins = sharedHistogram(
-      classic.terminals,
-      adaptive.terminals,
-      BINS,
-      logBins,
-      fmtCapital,
-    )
+    const bins = sharedHistogram(classic.terminals, adaptive.terminals, BINS, logBins, fmtCapital);
     return bins.map((b, k) => ({
       key: String(k),
       ...b,
-      range: b.ruinBin ? 'ruined (≤ 0)' : `${fmtCapital(b.lo)} – ${fmtCapital(b.hi)}`,
-    }))
-  }, [classic.terminals, adaptive.terminals, logBins])
+      range: b.ruinBin ? "ruined (≤ 0)" : `${fmtCapital(b.lo)} – ${fmtCapital(b.hi)}`,
+    }));
+  }, [classic.terminals, adaptive.terminals, logBins]);
 
-  const startBin = data.findIndex((b) => !b.ruinBin && params.C0 >= b.lo && params.C0 < b.hi)
-  const tickEvery = Math.max(1, Math.ceil(data.length / 9))
+  const startBin = data.findIndex((b) => !b.ruinBin && params.C0 >= b.lo && params.C0 < b.hi);
+  const tickEvery = Math.max(1, Math.ceil(data.length / 9));
 
   return (
     <ChartCard
@@ -48,22 +33,22 @@ export function TerminalHistogram({ result, theme }: { result: SimResult; theme:
       tools={
         <Segmented
           ariaLabel="Bin spacing"
-          value={logBins ? 'log' : 'linear'}
-          onChange={(v) => setLogBins(v === 'log')}
+          value={logBins ? "log" : "linear"}
+          onChange={(v) => setLogBins(v === "log")}
           options={[
-            { value: 'log', label: 'Log bins' },
-            { value: 'linear', label: 'Linear bins' },
+            { value: "log", label: "Log bins" },
+            { value: "linear", label: "Linear bins" },
           ]}
         />
       }
       table={{
-        columns: ['Terminal capital range', 'Classic paths', 'Adaptive paths'],
+        columns: ["Terminal capital range", "Classic paths", "Adaptive paths"],
         rows: data.map((b) => [b.range, fmtInt(b.classic), fmtInt(b.adaptive)]),
       }}
       footnote={
         logBins
           ? 'Log bins: terminal wealth is roughly log-normal, so equal-width log bins are the honest view. Paths at or below zero cannot be placed on a log axis and get the dedicated "ruined" bucket at the far left.'
-          : 'Linear bins: a handful of runaway paths stretch the axis and squash everything else into the first bin. Log bins usually read better.'
+          : "Linear bins: a handful of runaway paths stretch the axis and squash everything else into the first bin. Log bins usually read better."
       }
     >
       <div className="chart-wrap">
@@ -74,13 +59,13 @@ export function TerminalHistogram({ result, theme }: { result: SimResult; theme:
               dataKey="key"
               interval={tickEvery - 1}
               tickFormatter={(k: string) => {
-                const b = data[Number(k)]
-                return b ? (b.ruinBin ? 'ruined' : fmtCapital(b.lo)) : ''
+                const b = data[Number(k)];
+                return b ? (b.ruinBin ? "ruined" : fmtCapital(b.lo)) : "";
               }}
               {...axisProps(theme)}
               label={{
-                value: 'terminal capital',
-                position: 'insideBottom',
+                value: "terminal capital",
+                position: "insideBottom",
                 offset: -14,
                 fill: theme.muted,
                 fontSize: 11,
@@ -91,9 +76,9 @@ export function TerminalHistogram({ result, theme }: { result: SimResult; theme:
               width={54}
               {...axisProps(theme)}
               label={{
-                value: 'paths',
+                value: "paths",
                 angle: -90,
-                position: 'insideLeft',
+                position: "insideLeft",
                 fill: theme.muted,
                 fontSize: 11,
               }}
@@ -104,7 +89,7 @@ export function TerminalHistogram({ result, theme }: { result: SimResult; theme:
                 stroke={theme.axis}
                 label={{
                   value: `start ${fmtCapital(params.C0)}`,
-                  position: 'top',
+                  position: "top",
                   fill: theme.muted,
                   fontSize: 10.5,
                 }}
@@ -114,48 +99,36 @@ export function TerminalHistogram({ result, theme }: { result: SimResult; theme:
               cursor={{ fill: theme.grid, fillOpacity: 0.4 }}
               content={
                 <VizTooltip
-                  titleFmt={() => ''}
+                  titleFmt={() => ""}
                   series={[
-                    { key: 'range', label: 'Range', color: theme.muted, fmt: (v) => String(v) },
+                    { key: "range", label: "Range", color: theme.muted, fmt: (v) => String(v) },
                     {
-                      key: 'classic',
-                      label: 'Classic',
+                      key: "classic",
+                      label: "Classic",
                       color: theme.classic,
-                      fmt: (v) =>
-                        `${fmtInt(Number(v))} (${fmtPct(Number(v) / params.paths, 1)})`,
+                      fmt: (v) => `${fmtInt(Number(v))} (${fmtPct(Number(v) / params.paths, 1)})`,
                     },
                     {
-                      key: 'adaptive',
-                      label: 'Adaptive',
+                      key: "adaptive",
+                      label: "Adaptive",
                       color: theme.adaptive,
-                      fmt: (v) =>
-                        `${fmtInt(Number(v))} (${fmtPct(Number(v) / params.paths, 1)})`,
+                      fmt: (v) => `${fmtInt(Number(v))} (${fmtPct(Number(v) / params.paths, 1)})`,
                     },
                   ]}
                 />
               }
             />
-            <Bar
-              dataKey="classic"
-              fill={theme.classic}
-              radius={[3, 3, 0, 0]}
-              isAnimationActive={false}
-            />
-            <Bar
-              dataKey="adaptive"
-              fill={theme.adaptive}
-              radius={[3, 3, 0, 0]}
-              isAnimationActive={false}
-            />
+            <Bar dataKey="classic" fill={theme.classic} radius={[3, 3, 0, 0]} isAnimationActive={false} />
+            <Bar dataKey="adaptive" fill={theme.adaptive} radius={[3, 3, 0, 0]} isAnimationActive={false} />
           </BarChart>
         </ResponsiveContainer>
         <Legend
           entries={[
-            { label: 'Classic — constant λ', color: theme.classic, kind: 'area' },
-            { label: 'Adaptive — λ(C)', color: theme.adaptive, kind: 'area' },
+            { label: "Classic — constant λ", color: theme.classic, kind: "area" },
+            { label: "Adaptive — λ(C)", color: theme.adaptive, kind: "area" },
           ]}
         />
       </div>
     </ChartCard>
-  )
+  );
 }

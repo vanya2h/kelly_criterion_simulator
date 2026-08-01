@@ -1,9 +1,9 @@
-import { useState } from 'react'
-import { AUTORUN_STEP_BUDGET, stepCount } from '../lib/params'
-import { fmtCapital, fmtInt, fmtNum, fmtPct } from '../lib/format'
-import type { Params } from '../lib/types'
-import type { SimState } from '../hooks/useSimulation'
-import { Field, Toggle } from './ui'
+import { useState } from "react";
+import type { SimState } from "../hooks/useSimulation";
+import { fmtCapital, fmtInt, fmtNum, fmtPct } from "../lib/format";
+import { AUTORUN_STEP_BUDGET, stepCount } from "../lib/params";
+import type { Params } from "../lib/types";
+import { Field, Toggle } from "./ui";
 
 /**
  * Everything below the fold is a knob with a defensible default. What stays
@@ -20,20 +20,20 @@ export function Controls({
   autoRun,
   setAutoRun,
 }: {
-  params: Params
-  patch: (p: Partial<Params>) => void
-  onRun: () => void
-  onCancel: () => void
-  onReset: () => void
-  state: SimState
-  autoRun: boolean
-  setAutoRun: (v: boolean) => void
+  params: Params;
+  patch: (p: Partial<Params>) => void;
+  onRun: () => void;
+  onCancel: () => void;
+  onReset: () => void;
+  state: SimState;
+  autoRun: boolean;
+  setAutoRun: (v: boolean) => void;
 }) {
-  const [advanced, setAdvanced] = useState(false)
-  const steps = stepCount(params)
-  const tooBigForAuto = steps > AUTORUN_STEP_BUDGET
-  const running = state.status === 'running'
-  const pct = state.total ? state.done / state.total : 0
+  const [advanced, setAdvanced] = useState(false);
+  const steps = stepCount(params);
+  const tooBigForAuto = steps > AUTORUN_STEP_BUDGET;
+  const running = state.status === "running";
+  const pct = state.total ? state.done / state.total : 0;
 
   return (
     <aside className="controls">
@@ -41,9 +41,9 @@ export function Controls({
         <button
           className="primary"
           onClick={running ? onCancel : onRun}
-          title={running ? 'Stop the run in flight' : 'Reroll the seed and run — fresh dice'}
+          title={running ? "Stop the run in flight" : "Reroll the seed and run — fresh dice"}
         >
-          {running ? 'Cancel' : 'Run simulation'}
+          {running ? "Cancel" : "Run simulation"}
         </button>
       </div>
       <div className="progress" aria-hidden={!running}>
@@ -52,12 +52,12 @@ export function Controls({
       <p className="status-line">
         {running
           ? `${fmtInt(state.done)} / ${fmtInt(state.total)} paths…`
-          : state.status === 'error'
+          : state.status === "error"
             ? `Error: ${state.error}`
             : state.result
               ? `${fmtInt(state.result.params.paths)} paths in ${fmtInt(state.result.elapsedMs)} ms`
-              : 'Not run yet'}
-        {autoRun && tooBigForAuto && ' · too large to auto-run, press Run'}
+              : "Not run yet"}
+        {autoRun && tooBigForAuto && " · too large to auto-run, press Run"}
       </p>
 
       <div className="group">
@@ -148,28 +148,19 @@ export function Controls({
         />
       </div>
 
-      <button
-        type="button"
-        className="disclosure"
-        aria-expanded={advanced}
-        onClick={() => setAdvanced((v) => !v)}
-      >
+      <button type="button" className="disclosure" aria-expanded={advanced} onClick={() => setAdvanced((v) => !v)}>
         <span className="chev" aria-hidden>
-          {advanced ? '▾' : '▸'}
+          {advanced ? "▾" : "▸"}
         </span>
         Advanced settings
-        <span className="disclosure-note">
-          {advanced ? 'hide' : 'shape · frictions · seed'}
-        </span>
+        <span className="disclosure-note">{advanced ? "hide" : "shape · frictions · seed"}</span>
       </button>
 
       {advanced && (
         <>
           <div className="group">
             <h2>Adaptive curve shape</h2>
-            <p className="group-note">
-              λ(C) = λ_min + (λ_max − λ_min) / (1 + (C / C_ref)^steepness)
-            </p>
+            <p className="group-note">λ(C) = λ_min + (λ_max − λ_min) / (1 + (C / C_ref)^steepness)</p>
             <Field
               label="C_ref — capital midpoint"
               hint="The bankroll where λ sits exactly halfway between λ_min and λ_max. Move it to slide the whole ramp."
@@ -201,8 +192,8 @@ export function Controls({
           <div className="group">
             <h2>Capital, frictions &amp; ruin</h2>
             <p className="group-note">
-              The minimum bet is the knob that decides whether ruin is possible at all — with
-              continuous stakes neither strategy can ever reach zero.
+              The minimum bet is the knob that decides whether ruin is possible at all — with continuous stakes neither
+              strategy can ever reach zero.
             </p>
             <Field
               label="C₀ — starting capital"
@@ -266,10 +257,9 @@ export function Controls({
           <div className="group">
             <h2>Randomness</h2>
             <p className="group-note">
-              <strong>Run simulation</strong> rerolls the seed, so every click is a fresh set of
-              dice. Changing a parameter keeps the seed, so the charts move because the strategy
-              changed and not because the dice did. Type a seed back in to reproduce that run
-              exactly.
+              <strong>Run simulation</strong> rerolls the seed, so every click is a fresh set of dice. Changing a
+              parameter keeps the seed, so the charts move because the strategy changed and not because the dice did.
+              Type a seed back in to reproduce that run exactly.
             </p>
             <Field
               label="seed"
@@ -289,19 +279,18 @@ export function Controls({
               <Toggle label="Auto-run on change" checked={autoRun} onChange={setAutoRun} />
             </div>
             <p className="field-hint">
-              Reruns 300 ms after the last change while the job stays under{' '}
-              {fmtInt(AUTORUN_STEP_BUDGET)} bet-steps ({fmtInt(steps)} right now). Larger jobs wait
-              for the button so a slider drag cannot stall the machine.
+              Reruns 300 ms after the last change while the job stays under {fmtInt(AUTORUN_STEP_BUDGET)} bet-steps (
+              {fmtInt(steps)} right now). Larger jobs wait for the button so a slider drag cannot stall the machine.
             </p>
           </div>
         </>
       )}
 
       <div className="group">
-        <button type="button" onClick={onReset} style={{ width: '100%' }}>
+        <button type="button" onClick={onReset} style={{ width: "100%" }}>
           Reset all parameters
         </button>
       </div>
     </aside>
-  )
+  );
 }

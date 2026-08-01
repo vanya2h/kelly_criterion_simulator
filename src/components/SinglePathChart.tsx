@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState } from "react";
 import {
   CartesianGrid,
   LabelList,
@@ -9,45 +9,43 @@ import {
   Tooltip,
   XAxis,
   YAxis,
-} from 'recharts'
-import { simulateSinglePath } from '../lib/simulate'
-import { downsample } from '../lib/stats'
-import { fmtCapital, fmtInt } from '../lib/format'
-import type { ChartTheme } from '../lib/chartTheme'
-import type { Params } from '../lib/types'
-import { ChartCard, Legend, Segmented } from './ui'
-import { VizTooltip } from './chartBits'
-import { axisProps, endLabel, logFloorFor } from './chartHelpers'
+} from "recharts";
+import type { ChartTheme } from "../lib/chartTheme";
+import { fmtCapital, fmtInt } from "../lib/format";
+import { simulateSinglePath } from "../lib/simulate";
+import { downsample } from "../lib/stats";
+import type { Params } from "../lib/types";
+import { VizTooltip } from "./chartBits";
+import { axisProps, endLabel, logFloorFor } from "./chartHelpers";
+import { ChartCard, Legend, Segmented } from "./ui";
 
-type Pick = 'median' | 'best' | 'worst' | 'custom'
+type Pick = "median" | "best" | "worst" | "custom";
 
 export function SinglePathChart({
   params,
   theme,
   indices,
 }: {
-  params: Params
-  theme: ChartTheme
+  params: Params;
+  theme: ChartTheme;
   /** Path indices of interest from the last Monte Carlo run, if there is one. */
-  indices: { median: number; best: number; worst: number } | null
+  indices: { median: number; best: number; worst: number } | null;
 }) {
-  const [pick, setPick] = useState<Pick>('median')
-  const [custom, setCustom] = useState(0)
-  const [logScale, setLogScale] = useState(true)
+  const [pick, setPick] = useState<Pick>("median");
+  const [custom, setCustom] = useState(0);
+  const [logScale, setLogScale] = useState(true);
 
   const pathIndex =
-    pick === 'custom' || !indices
-      ? Math.min(Math.max(0, custom), Math.max(0, params.paths - 1))
-      : indices[pick]
+    pick === "custom" || !indices ? Math.min(Math.max(0, custom), Math.max(0, params.paths - 1)) : indices[pick];
 
-  const trace = useMemo(() => simulateSinglePath(params, pathIndex), [params, pathIndex])
+  const trace = useMemo(() => simulateSinglePath(params, pathIndex), [params, pathIndex]);
 
-  const floor = logFloorFor(params.C0)
+  const floor = logFloorFor(params.C0);
 
   const data = useMemo(() => {
     // A log axis cannot render 0, so ruined paths are pinned to the floor.
-    const clamp = (v: number) => (logScale ? Math.max(v, floor) : v)
-    const rows = []
+    const clamp = (v: number) => (logScale ? Math.max(v, floor) : v);
+    const rows = [];
     for (let i = 0; i <= params.N; i++) {
       rows.push({
         i,
@@ -55,26 +53,24 @@ export function SinglePathChart({
         adaptive: clamp(trace.adaptive[i]),
         classicRaw: trace.classic[i],
         adaptiveRaw: trace.adaptive[i],
-      })
+      });
     }
-    return downsample(rows, 700)
-  }, [trace, params.N, logScale, floor])
+    return downsample(rows, 700);
+  }, [trace, params.N, logScale, floor]);
 
-  const last = data.length - 1
-  let hi = params.C0
-  let lo = params.C0
+  const last = data.length - 1;
+  let hi = params.C0;
+  let lo = params.C0;
   for (const d of data) {
-    hi = Math.max(hi, d.classic, d.adaptive)
-    lo = Math.min(lo, d.classic, d.adaptive)
+    hi = Math.max(hi, d.classic, d.adaptive);
+    lo = Math.min(lo, d.classic, d.adaptive);
   }
   // Fit the log axis to the data, not to the clamp floor — otherwise a run that
   // never goes near zero still gets decades of empty axis underneath it.
-  const domain: [number, number] = logScale
-    ? [Math.max(floor, lo / 1.4), hi * 1.15]
-    : [0, hi * 1.05]
+  const domain: [number, number] = logScale ? [Math.max(floor, lo / 1.4), hi * 1.15] : [0, hi * 1.05];
 
-  const finalClassic = trace.classic[params.N]
-  const finalAdaptive = trace.adaptive[params.N]
+  const finalClassic = trace.classic[params.N];
+  const finalAdaptive = trace.adaptive[params.N];
 
   return (
     <ChartCard
@@ -87,13 +83,13 @@ export function SinglePathChart({
             value={pick}
             onChange={setPick}
             options={[
-              { value: 'median', label: 'Median' },
-              { value: 'best', label: 'Best' },
-              { value: 'worst', label: 'Worst' },
-              { value: 'custom', label: '#' },
+              { value: "median", label: "Median" },
+              { value: "best", label: "Best" },
+              { value: "worst", label: "Worst" },
+              { value: "custom", label: "#" },
             ]}
           />
-          {pick === 'custom' && (
+          {pick === "custom" && (
             <input
               type="number"
               min={0}
@@ -105,30 +101,25 @@ export function SinglePathChart({
           )}
           <Segmented
             ariaLabel="Capital axis scale"
-            value={logScale ? 'log' : 'linear'}
-            onChange={(v) => setLogScale(v === 'log')}
+            value={logScale ? "log" : "linear"}
+            onChange={(v) => setLogScale(v === "log")}
             options={[
-              { value: 'log', label: 'Log' },
-              { value: 'linear', label: 'Linear' },
+              { value: "log", label: "Log" },
+              { value: "linear", label: "Linear" },
             ]}
           />
         </>
       }
       table={{
-        columns: ['Bet #', 'Classic capital', 'Adaptive capital'],
-        rows: downsample(data, 120).map((d) => [
-          fmtInt(d.i),
-          fmtCapital(d.classicRaw),
-          fmtCapital(d.adaptiveRaw),
-        ]),
+        columns: ["Bet #", "Classic capital", "Adaptive capital"],
+        rows: downsample(data, 120).map((d) => [fmtInt(d.i), fmtCapital(d.classicRaw), fmtCapital(d.adaptiveRaw)]),
       }}
       footnote={
         <>
           Path #{pathIndex}
-          {indices && pick !== 'custom' ? ` — the ${pick} path by classic terminal capital` : ''}.{' '}
+          {indices && pick !== "custom" ? ` — the ${pick} path by classic terminal capital` : ""}.{" "}
           {trace.classicRuinStep >= 0 && `Classic ruined at bet ${fmtInt(trace.classicRuinStep)}. `}
-          {trace.adaptiveRuinStep >= 0 &&
-            `Adaptive ruined at bet ${fmtInt(trace.adaptiveRuinStep)}. `}
+          {trace.adaptiveRuinStep >= 0 && `Adaptive ruined at bet ${fmtInt(trace.adaptiveRuinStep)}. `}
           {logScale && `Log axis clamps at ${fmtCapital(floor)}; ruined paths flatten there.`}
         </>
       }
@@ -144,15 +135,15 @@ export function SinglePathChart({
               tickFormatter={fmtInt}
               {...axisProps(theme)}
               label={{
-                value: 'bet number',
-                position: 'insideBottom',
+                value: "bet number",
+                position: "insideBottom",
                 offset: -12,
                 fill: theme.muted,
                 fontSize: 11,
               }}
             />
             <YAxis
-              scale={logScale ? 'log' : 'linear'}
+              scale={logScale ? "log" : "linear"}
               domain={domain}
               allowDataOverflow
               tickFormatter={fmtCapital}
@@ -163,8 +154,8 @@ export function SinglePathChart({
               y={params.C0}
               stroke={theme.axis}
               label={{
-                value: 'start',
-                position: 'insideTopLeft',
+                value: "start",
+                position: "insideTopLeft",
                 fill: theme.muted,
                 fontSize: 10.5,
               }}
@@ -182,15 +173,15 @@ export function SinglePathChart({
                   titleFmt={(l) => `after ${fmtInt(Number(l))} bets`}
                   series={[
                     {
-                      key: 'classicRaw',
-                      label: 'Classic',
+                      key: "classicRaw",
+                      label: "Classic",
                       color: theme.classic,
                       line: true,
                       fmt: (v) => fmtCapital(Number(v)),
                     },
                     {
-                      key: 'adaptiveRaw',
-                      label: 'Adaptive',
+                      key: "adaptiveRaw",
+                      label: "Adaptive",
                       color: theme.adaptive,
                       line: true,
                       fmt: (v) => fmtCapital(Number(v)),
@@ -223,11 +214,11 @@ export function SinglePathChart({
         </ResponsiveContainer>
         <Legend
           entries={[
-            { label: 'Classic — constant λ', color: theme.classic },
-            { label: 'Adaptive — λ(C)', color: theme.adaptive },
+            { label: "Classic — constant λ", color: theme.classic },
+            { label: "Adaptive — λ(C)", color: theme.adaptive },
           ]}
         />
       </div>
     </ChartCard>
-  )
+  );
 }
